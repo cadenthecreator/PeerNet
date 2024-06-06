@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
-        run: brew install gdk-pixbuf pango
+        run: brew install gdk-pixbuf pango gdk
       - uses: actions-rs/cargo@v1
         with:
           command: build
@@ -35,7 +35,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
-        run: brew install gdk-pixbuf pango
+        run: brew install gdk-pixbuf pango gdk
       - uses: actions-rs/cargo@v1
         with:
           command: build
@@ -64,7 +64,7 @@ jobs:
           command: build
           args: --release
       - name: Rename binary
-        run: mv target/release/peernet peernet-linux-amd64
+        run: mv target/release/peernet peernet-linux-amd64 gdk-3.0
       - name: Upload to release
         uses: actions/upload-release-asset@v1
         env:
