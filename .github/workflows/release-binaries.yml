@@ -19,17 +19,18 @@ jobs:
           args: --release
       - name: Rename binary
         run: mv target/release/PeerNet PeerNet-macos-arm64
+      - name: Set upload URL
+        run: echo "upload_url=${{ github.event.release.upload_url }}" >> $GITHUB_OUTPUT
       - name: Upload to release
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: |
-          echo "upload_url=${{ github.event.release.upload_url }}" >> $GITHUB_OUTPUT
           curl \
             -X POST \
             -H "Authorization: token ${{ secrets.PERSONAL_ACCESS_TOKEN }}" \
             -H "Content-Type: application/octet-stream" \
             --data-binary @./PeerNet-macos-arm64 \
-            ${{ steps.upload.outputs.upload_url }}?name=PeerNet-macos-arm64
+            "${{ steps.set_upload_url.outputs.upload_url }}?name=PeerNet-macos-arm64"
 
   build_for_mac:
     name: MacOS
@@ -44,17 +45,18 @@ jobs:
           args: --release
       - name: Rename binary
         run: mv target/release/PeerNet PeerNet-macos64
+      - name: Set upload URL
+        run: echo "upload_url=${{ github.event.release.upload_url }}" >> $GITHUB_OUTPUT
       - name: Upload to release
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: |
-          echo "upload_url=${{ github.event.release.upload_url }}" >> $GITHUB_OUTPUT
           curl \
             -X POST \
             -H "Authorization: token ${{ secrets.PERSONAL_ACCESS_TOKEN }}" \
             -H "Content-Type: application/octet-stream" \
             --data-binary @./PeerNet-macos64 \
-            ${{ steps.upload.outputs.upload_url }}?name=PeerNet-macos64
+            "${{ steps.set_upload_url.outputs.upload_url }}?name=PeerNet-macos64"
 
   build_for_linux:
     name: Linux
@@ -69,17 +71,18 @@ jobs:
           args: --release
       - name: Rename binary
         run: mv target/release/PeerNet PeerNet-linux-amd64
+      - name: Set upload URL
+        run: echo "upload_url=${{ github.event.release.upload_url }}" >> $GITHUB_OUTPUT
       - name: Upload to release
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: |
-          echo "upload_url=${{ github.event.release.upload_url }}" >> $GITHUB_OUTPUT
           curl \
             -X POST \
             -H "Authorization: token ${{ secrets.PERSONAL_ACCESS_TOKEN }}" \
             -H "Content-Type: application/octet-stream" \
             --data-binary @./PeerNet-linux-amd64 \
-            ${{ steps.upload.outputs.upload_url }}?name=PeerNet-linux-amd64
+            "${{ steps.set_upload_url.outputs.upload_url }}?name=PeerNet-linux-amd64"
 
   build_for_windows:
     name: Windows
@@ -99,14 +102,15 @@ jobs:
           args: --release
       - name: Rename binary
         run: Rename-Item target\release\PeerNet.exe PeerNet-windows.exe
+      - name: Set upload URL
+        run: echo "upload_url=${{ github.event.release.upload_url }}" >> $GITHUB_OUTPUT
       - name: Upload to release
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: |
-          echo "upload_url=${{ github.event.release.upload_url }}" >> $GITHUB_OUTPUT
           curl \
             -X POST \
             -H "Authorization: token ${{ secrets.PERSONAL_ACCESS_TOKEN }}" \
             -H "Content-Type: application/octet-stream" \
             --data-binary @./PeerNet-windows.exe \
-            ${{ steps.upload.outputs.upload_url }}?name=PeerNet-windows.exe
+            "${{ steps.set_upload_url.outputs.upload_url }}?name=PeerNet-windows.exe"
