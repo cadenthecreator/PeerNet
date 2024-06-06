@@ -94,9 +94,7 @@ async fn main() {
                 let socket_clone = socket_clone_inner.clone();
                 let broadcast_addr = broadcast_addr.clone();
                 let content = content.clone();
-                tokio::spawn(async move {
-                    sendmsg(home_dir().file_name().expect("failed to get username").to_str().unwrap().to_string(), content, socket_clone, &broadcast_addr).await.unwrap();
-                });
+                sendmsg(home_dir().file_name().expect("failed to get username").to_str().unwrap().to_string(), content, socket_clone, &broadcast_addr);
             }
             entry.set_text("");
         });
