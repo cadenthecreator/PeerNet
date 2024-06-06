@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
-        run: brew install gdk-pixbuf
+        run: brew install gdk-pixbuf pango
       - uses: actions-rs/cargo@v1
         with:
           command: build
@@ -35,7 +35,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
-        run: brew install gdk-pixbuf
+        run: brew install gdk-pixbuf pango
       - uses: actions-rs/cargo@v1
         with:
           command: build
@@ -58,7 +58,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y gdk-pixbuf2.0-dev
+        run: sudo apt-get update && sudo apt-get install -y gdk-pixbuf2.0-dev libpango1.0-dev
       - uses: actions-rs/cargo@v1
         with:
           command: build
