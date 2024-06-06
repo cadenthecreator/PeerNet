@@ -1,13 +1,15 @@
 use std::io;
 use std::net::UdpSocket;
-use std::sync::{Arc, Mutex};
-use std::time::Duration;
+use std::sync::{Arc, Mutex, MutexGuard};
+use std::time::{Duration, SystemTime};
+use chrono::{DateTime, TimeZone};
 use glib::ControlFlow::Continue;
 use glib::{home_dir, timeout_add_local};
 use gtk::prelude::*;
 use gtk::{glib, Application, ApplicationWindow, Box, Entry, Orientation, TextView, ScrolledWindow, Adjustment, TextBuffer, TextTagTable};
 use tokio::task;
 use log::{info, warn};
+use time::Time;
 
 fn begin_receive(socket: UdpSocket, chathistory: Arc<Mutex<Vec<String>>>) {
     task::spawn(async move {
@@ -17,7 +19,10 @@ fn begin_receive(socket: UdpSocket, chathistory: Arc<Mutex<Vec<String>>>) {
                 Ok((amt, src)) => {
                     info!("Received {} bytes from {}: {}", amt, src, String::from_utf8_lossy(&buffer[..amt]));
                     let mut ch = chathistory.lock().unwrap();
-                    ch.push(String::from_utf8_lossy(&buffer[..amt]).into_owned());
+                    let data = String::from_utf8_lossy(&buffer[..amt]).into_owned();
+                    //let mut dtdata = data.split("|");
+                    //let dt = dtdata.next().expect("shit");
+                    ch.push(data);
                 }
                 Err(e) => {
                     warn!("Failed to receive: {}", e);
@@ -28,15 +33,22 @@ fn begin_receive(socket: UdpSocket, chathistory: Arc<Mutex<Vec<String>>>) {
 }
 
 fn sendmsg(username: String, content: String, socket: Arc<Mutex<UdpSocket>>, broadcast_addr: &str) -> io::Result<usize> {
-    let message = format!("<{username}> {content}");
+    let timestamp = chrono::offset::Local::now();
+    let message = format!("{timestamp}|<{username}> {content}");
     let message = message.as_bytes();
     let socket = socket.lock().unwrap();
     socket.send_to(message, broadcast_addr)
 }
 
 fn makestring(shared_data: &Arc<Mutex<Vec<String>>>) -> String {
-    let lines = shared_data.lock().unwrap();
-    lines.join("\n")
+    let lines: Vec<String> = shared_data.lock().unwrap().clone();
+    let mut outvec: Vec<String> = vec![];
+    for i in lines.into_iter() {
+        let time = i.split("|").next().unwrap().to_owned() +"|";
+        let finalstr = i.replace(time.as_str(), "").clone();
+        outvec.push(finalstr)
+    }
+    outvec.join("\n")
 }
 
 #[tokio::main]

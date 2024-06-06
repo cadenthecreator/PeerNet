@@ -9,3 +9,4 @@ gtk = "0.18.1"
 tokio = { version = "1.38.0", features = ["rt", "rt-multi-thread", "macros", "time"] }
 time = "0.3.36"
 log = "0.4.21"
+chrono = "0.4.38"
