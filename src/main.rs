@@ -5,7 +5,7 @@ use std::time::Duration;
 use glib::ControlFlow::Continue;
 use glib::{home_dir, timeout_add_local};
 use gtk::prelude::*;
-use gtk::{glib, Application, ApplicationWindow, Box, Entry, Label, Orientation, TextView, ScrolledWindow, Adjustment, TextBuffer, TextTagTable};
+use gtk::{glib, Application, ApplicationWindow, Box, Entry, Orientation, TextView, ScrolledWindow, Adjustment, TextBuffer, TextTagTable};
 use tokio::task;
 use log::{info, warn};
 
@@ -44,16 +44,16 @@ async fn main() {
     let shared_data: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(vec![]));
     let socket = Arc::new(Mutex::new(UdpSocket::bind("0.0.0.0:34254").unwrap()));
     socket.lock().unwrap().set_broadcast(true).expect("failed to set broadcast");
-    begin_receive(socket.lock().unwrap().try_clone().unwrap(), Arc::clone(&shared_data));
+    begin_receive(socket.lock().unwrap().try_clone().unwrap(), shared_data.clone());
     let broadcast_addr = "255.255.255.255:34254";
     let app = Application::builder()
         .application_id("org.caden.PeerNet")
         .build();
 
-    let shared_data_clone = Arc::clone(&shared_data);
-    let socket_clone = Arc::clone(&socket);
+    let shared_data_clone = shared_data.clone();
+    let socket_clone = socket.clone();
 
-    app.connect_activate(move |app| unsafe {
+    app.connect_activate(move |app|  {
         // We create the main window.
         let window = ApplicationWindow::builder()
             .application(app)
@@ -86,13 +86,12 @@ async fn main() {
         window.set_child(Some(&vbox));
         window.show_all();
 
-        let socket_clone_inner = Arc::clone(&socket_clone);
+        let socket_clone_inner = socket_clone.clone();
         let broadcast_addr = broadcast_addr.to_string();
-        let mut dothing = false;
         text_input.connect_activate(move |entry| {
             let content = entry.text().to_string();
             if !content.is_empty() {
-                let socket_clone = Arc::clone(&socket_clone_inner);
+                let socket_clone = socket_clone_inner.clone();
                 let broadcast_addr = broadcast_addr.clone();
                 let content = content.clone();
                 tokio::spawn(async move {
@@ -103,7 +102,7 @@ async fn main() {
         });
         let mut lastval = "".to_string();
         let mut lastupper = 0.0;
-        let shared_data_clone_inner = Arc::clone(&shared_data_clone);
+        let shared_data_clone_inner = shared_data_clone.clone();
         timeout_add_local(Duration::from_millis(10), move || {
             let text = makestring(&shared_data_clone_inner);
             if text != lastval {
