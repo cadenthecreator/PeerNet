@@ -117,6 +117,9 @@ async fn main() {
         });
 
         // Show the window.
+        window.connect_delete_event(|_, _| {
+            std::process::exit(0);
+        });
         window.present();
     });
     app.run();
