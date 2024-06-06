@@ -71,6 +71,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./peernet-linux-amd64
-          asset_name: peernet-linux-amd64
+          asset_path: ./PeerNet-linux-amd64
+          asset_name: PeerNet-linux-amd64
           asset_content_type: application/octet-stream
