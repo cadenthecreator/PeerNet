@@ -80,20 +80,22 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install dependencies
+      - name: Install MSYS2 and dependencies
         run: |
-          choco install python --version=3.9.13
-          choco install pkgconfiglite
-          python -m pip install --upgrade pip
-          pip install meson ninja
-      - name: Set up GTK for Windows
-        uses: yjpictures/GTK-Windows@v1.0.0
+          choco install -y msys2
+          msys2 -c "pacman -Sy --noconfirm"
+          msys2 -c "pacman -S --noconfirm mingw-w64-x86_64-toolchain mingw-w64-x86_64-pkg-config mingw-w64-x86_64-gtk3 mingw-w64-x86_64-glib2"
+      - name: Add MSYS2 to PATH
+        run: echo "C:\msys64\mingw64\bin" >> $env:GITHUB_PATH
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: stable-x86_64-pc-windows-msvc
           override: true
       - uses: actions-rs/cargo@v1
+        env:
+          PKG_CONFIG_SYSROOT_DIR: /
+          PKG_CONFIG_PATH: /mingw64/lib/pkgconfig
         with:
           command: build
           args: --release
