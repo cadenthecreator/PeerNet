@@ -80,11 +80,18 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install MSYS2 and dependencies
+      - name: Install MinGW and dependencies
         run: |
-          choco install -y msys2
-          msys2 -c "pacman -Sy --noconfirm"
-          msys2 -c "pacman -S --noconfirm mingw-w64-x86_64-toolchain mingw-w64-x86_64-pkg-config mingw-w64-x86_64-gtk3 mingw-w64-x86_64-glib2"
+            choco install mingw
+            curl -L http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/pkg-config_0.26-1_win32.zip -o pkg-config_0.26-1_win32.zip
+            unzip pkg-config_0.26-1_win32.zip -d C:\MinGW
+            curl -L http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/gettext-runtime_0.18.1.1-2_win32.zip -o gettext-runtime_0.18.1.1-2_win32.zip
+            unzip gettext-runtime_0.18.1.1-2_win32.zip -d C:\MinGW
+            curl -L http://ftp.gnome.org/pub/gnome/binaries/win32/glib/2.28/glib_2.28.8-1_win32.zip -o glib_2.28.8-1_win32.zip
+            unzip glib_2.28.8-1_win32.zip -d C:\MinGW
+            copy C:\MinGW\pkg-config_0.26-1_win32\bin\pkg-config.exe C:\MinGW\bin
+            copy C:\MinGW\gettext-runtime_0.18.1.1-2_win32\bin\intl.dll C:\MinGW\bin
+            copy C:\MinGW\glib_2.28.8-1_win32\bin\libglib-2.0-0.dll C:\MinGW\bin
       - name: Add MSYS2 to PATH
         run: echo "C:\msys64\mingw64\bin" >> $env:GITHUB_PATH
       - uses: actions-rs/toolchain@v1
