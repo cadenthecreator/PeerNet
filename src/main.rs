@@ -27,7 +27,7 @@ fn begin_receive(socket: UdpSocket, chathistory: Arc<Mutex<Vec<String>>>) {
     });
 }
 
-async fn sendmsg(username: String, content: String, socket: Arc<Mutex<UdpSocket>>, broadcast_addr: &str) -> io::Result<usize> {
+fn sendmsg(username: String, content: String, socket: Arc<Mutex<UdpSocket>>, broadcast_addr: &str) -> io::Result<usize> {
     let message = format!("<{username}> {content}");
     let message = message.as_bytes();
     let socket = socket.lock().unwrap();
@@ -88,13 +88,14 @@ async fn main() {
 
         let socket_clone_inner = socket_clone.clone();
         let broadcast_addr = broadcast_addr.to_string();
-        text_input.connect_activate(move |entry| {
+        text_input.connect_activate( move |entry| {
             let content = entry.text().to_string();
             if !content.is_empty() {
                 let socket_clone = socket_clone_inner.clone();
                 let broadcast_addr = broadcast_addr.clone();
                 let content = content.clone();
-                sendmsg(home_dir().file_name().expect("failed to get username").to_str().unwrap().to_string(), content, socket_clone, &broadcast_addr);
+
+                let _ = sendmsg(home_dir().file_name().expect("failed to get username").to_str().unwrap().to_string(), content, socket_clone, &broadcast_addr);
             }
             entry.set_text("");
         });
