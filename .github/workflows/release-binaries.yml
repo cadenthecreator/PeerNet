@@ -6,9 +6,9 @@ on:
       - created
 
 jobs:
-  build_for_mac:
-    name: MacOS
-    runs-on: macos-10.15
+  build_for_mac_arm:
+    name: MacOSArm
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/cargo@v1
@@ -27,23 +27,44 @@ jobs:
           asset_name: peernet-macos64
           asset_content_type: application/octet-stream
 
+  build_for_mac:
+      name: MacOS
+      runs-on: macos-13
+      steps:
+        - uses: actions/checkout@v2
+        - uses: actions-rs/cargo@v1
+          with:
+            command: build
+            args: --release
+        - name: Rename binary
+          run: mv target/release/peernet peernet-macos64
+        - name: Upload to release
+          uses: actions/upload-release-asset@v1
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          with:
+            upload_url: ${{ github.event.release.upload_url }}
+            asset_path: ./peernet-macos64
+            asset_name: peernet-macos64
+            asset_content_type: application/octet-stream
+
   build_for_linux:
-    name: Linux
-    runs-on: ubuntu-18.04
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release
-      - name: Rename binary
-        run: mv target/release/peernet peernet-linux-amd64
-      - name: Upload to release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./peernet-linux-amd64
-          asset_name: peernet-linux-amd64
-          asset_content_type: application/octet-stream
+      name: Linux
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+        - uses: actions-rs/cargo@v1
+          with:
+            command: build
+            args: --release
+        - name: Rename binary
+          run: mv target/release/peernet peernet-linux-amd64
+        - name: Upload to release
+          uses: actions/upload-release-asset@v1
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          with:
+            upload_url: ${{ github.event.release.upload_url }}
+            asset_path: ./peernet-linux-amd64
+            asset_name: peernet-linux-amd64
+            asset_content_type: application/octet-stream
