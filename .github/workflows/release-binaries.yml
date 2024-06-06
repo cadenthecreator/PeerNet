@@ -64,7 +64,7 @@ jobs:
           command: build
           args: --release
       - name: Rename binary
-        run: mv target/release/PeerNet ./PeerNet-linux-amd64
+        run: mv target/release/PeerNet PeerNet-linux-amd64
       - name: Upload to release
         uses: actions/upload-release-asset@v1
         env:
