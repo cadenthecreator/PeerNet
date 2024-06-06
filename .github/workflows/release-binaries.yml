@@ -89,6 +89,7 @@ jobs:
             unzip gettext-runtime_0.18.1.1-2_win32.zip -d C:\MinGW
             curl -L http://ftp.gnome.org/pub/gnome/binaries/win32/glib/2.28/glib_2.28.8-1_win32.zip -o glib_2.28.8-1_win32.zip
             unzip glib_2.28.8-1_win32.zip -d C:\MinGW
+            ls
             copy C:\MinGW\pkg-config_0.26-1_win32\bin\pkg-config.exe C:\MinGW\bin
             copy C:\MinGW\gettext-runtime_0.18.1.1-2_win32\bin\intl.dll C:\MinGW\bin
             copy C:\MinGW\glib_2.28.8-1_win32\bin\libglib-2.0-0.dll C:\MinGW\bin
