@@ -19,18 +19,15 @@ jobs:
           args: --release
       - name: Rename binary
         run: mv target/release/PeerNet PeerNet-macos-arm64
-      - name: Set upload URL
-        run: echo "upload_url=${{ github.event.release.upload_url }}" >> $GITHUB_OUTPUT
       - name: Upload to release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./PeerNet-macos-arm64
+          asset_name: PeerNet-macos-arm64
+          asset_content_type: application/octet-stream
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-        run: |
-          curl \
-            -X POST \
-            -H "Authorization: token ${{ secrets.PERSONAL_ACCESS_TOKEN }}" \
-            -H "Content-Type: application/octet-stream" \
-            --data-binary @./PeerNet-macos-arm64 \
-            "${{ steps.set_upload_url.outputs.upload_url }}?name=PeerNet-macos-arm64"
 
   build_for_mac:
     name: MacOS
@@ -45,18 +42,15 @@ jobs:
           args: --release
       - name: Rename binary
         run: mv target/release/PeerNet PeerNet-macos64
-      - name: Set upload URL
-        run: echo "upload_url=${{ github.event.release.upload_url }}" >> $GITHUB_OUTPUT
       - name: Upload to release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./PeerNet-macos64
+          asset_name: PeerNet-macos64
+          asset_content_type: application/octet-stream
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-        run: |
-          curl \
-            -X POST \
-            -H "Authorization: token ${{ secrets.PERSONAL_ACCESS_TOKEN }}" \
-            -H "Content-Type: application/octet-stream" \
-            --data-binary @./PeerNet-macos64 \
-            "${{ steps.set_upload_url.outputs.upload_url }}?name=PeerNet-macos64"
 
   build_for_linux:
     name: Linux
@@ -71,26 +65,34 @@ jobs:
           args: --release
       - name: Rename binary
         run: mv target/release/PeerNet PeerNet-linux-amd64
-      - name: Set upload URL
-        run: echo "upload_url=${{ github.event.release.upload_url }}" >> $GITHUB_OUTPUT
       - name: Upload to release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./PeerNet-linux-amd64
+          asset_name: PeerNet-linux-amd64
+          asset_content_type: application/octet-stream
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-        run: |
-          curl \
-            -X POST \
-            -H "Authorization: token ${{ secrets.PERSONAL_ACCESS_TOKEN }}" \
-            -H "Content-Type: application/octet-stream" \
-            --data-binary @./PeerNet-linux-amd64 \
-            "${{ steps.set_upload_url.outputs.upload_url }}?name=PeerNet-linux-amd64"
 
   build_for_windows:
     name: Windows
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install dependencies
-        run: choco install gtk3
+      - name: Install Python and dependencies
+        run: |
+          choco install python --version=3.7.9
+          python -m pip install --upgrade pip
+          pip install meson ninja
+      - name: Clone gvsbuild
+        run: git clone https://github.com/wingtk/gvsbuild.git
+      - name: Build GTK
+        run: |
+          cd gvsbuild
+          python build.py build gtk3
+      - name: Add GTK to PATH
+        run: echo "C:\gvsbuild\build\gtk\x64\release\bin" >> $env:GITHUB_PATH
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -102,15 +104,12 @@ jobs:
           args: --release
       - name: Rename binary
         run: Rename-Item target\release\PeerNet.exe PeerNet-windows.exe
-      - name: Set upload URL
-        run: echo "upload_url=${{ github.event.release.upload_url }}" >> $GITHUB_OUTPUT
       - name: Upload to release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./PeerNet-windows.exe
+          asset_name: PeerNet-windows.exe
+          asset_content_type: application/octet-stream
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-        run: |
-          curl \
-            -X POST \
-            -H "Authorization: token ${{ secrets.PERSONAL_ACCESS_TOKEN }}" \
-            -H "Content-Type: application/octet-stream" \
-            --data-binary @./PeerNet-windows.exe \
-            "${{ steps.set_upload_url.outputs.upload_url }}?name=PeerNet-windows.exe"
