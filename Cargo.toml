@@ -1,0 +1,11 @@
+[package]
+name = "p2p"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+glib = "0.19.7"
+gtk = "0.18.1"
+tokio = { version = "1.38.0", features = ["rt", "rt-multi-thread", "macros", "time"] }
+time = "0.3.36"
+log = "0.4.21"
