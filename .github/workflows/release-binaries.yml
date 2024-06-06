@@ -80,19 +80,8 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install Python and dependencies
-        run: |
-          choco install python --version=3.7.9
-          python -m pip install --upgrade pip
-          pip install meson ninja
-      - name: Clone gvsbuild
-        run: git clone https://github.com/wingtk/gvsbuild.git
-      - name: Build GTK
-        run: |
-          cd gvsbuild
-          python build.py build gtk3
-      - name: Add GTK to PATH
-        run: echo "C:\gvsbuild\build\gtk\x64\release\bin" >> $env:GITHUB_PATH
+      - name: Set up GTK for Windows
+        uses: JeroenDM/gtk-for-windows@v1
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
