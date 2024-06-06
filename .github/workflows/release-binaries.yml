@@ -80,3 +80,33 @@ jobs:
             -H "Content-Type: application/octet-stream" \
             --data-binary @./PeerNet-linux-amd64 \
             ${{ steps.upload.outputs.upload_url }}?name=PeerNet-linux-amd64
+
+  build_for_windows:
+    name: Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: choco install gtk3
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable-x86_64-pc-windows-msvc
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release
+      - name: Rename binary
+        run: Rename-Item target\release\PeerNet.exe PeerNet-windows.exe
+      - name: Upload to release
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        run: |
+          echo "upload_url=${{ github.event.release.upload_url }}" >> $GITHUB_OUTPUT
+          curl \
+            -X POST \
+            -H "Authorization: token ${{ secrets.PERSONAL_ACCESS_TOKEN }}" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary @./PeerNet-windows.exe \
+            ${{ steps.upload.outputs.upload_url }}?name=PeerNet-windows.exe
